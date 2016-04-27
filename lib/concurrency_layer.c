@@ -33,10 +33,25 @@ void * broker(void * args) {
     }
 }
 
-
+// operation_executer: retrieves operation from the operations_queue and processes them, causing an update in the market. 
 void* operation_executer(void * args) {
-}
+/* Input: exec_info -->
+1) int *exit
+2) stock_market * market
+3) pthread_mutex_t * exit_mutex
+*/
+    exec_info * currentInfo = (exec_info*) args; // Cast the *void pointer to a *exec_info pointer.
+    stock_market * currentMarket = currentInfo->market; // Create a stock_market pointer by dereferencing from the currentInfo pointer.
+    operation currentOperation; // operation struct to hold information of the last operation extracted from the queue.
 
+    while (*(currentInfo->exit) != 1) { // While exit flag is not active.
+	   if (operations_queue_empty(currentMarket->stock_operations) == 0) { // If operations_queue is not empty.
+	       dequeue_operation(currentMarket->stock_operations , &currentOperation); // Obtain the first operation.
+	       process_operation(currentInfo->market, &currentOperation); // Process it.
+	   }
+    }
+    return;
+}
 
 void* stats_reader(void * args) {
 }
